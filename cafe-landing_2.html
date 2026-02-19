@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kissa — A Quiet Place to Eat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cormorant:ital,wght@1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #F5EFE4;
+    --cream-deep: #EDE6DA;
+    --espresso:   #2C1A0E;
+    --espresso-mid: #4A2E1A;
+    --terracotta: #C4714A;
+    --terra-pale: #D4906E;
+    --sage:       #8A9E8C;
+    --warm-white: #F5EFE4;
+    --text:       #2C1A0E;
+    --text-mid:   #5A3D28;
+    --text-muted: #7A5C48;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 17px;
+  }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: #F5EFE4;
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--terracotta);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.3s, height 0.3s, opacity 0.3s;
+    opacity: 0.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F5EFE4;
+    border-bottom: 1px solid rgba(44,26,14,0.08);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--espresso);
+    text-decoration: none;
+  }
+  .nav-logo span {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+  .nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--espresso);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--terracotta);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--terracotta); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10rem 5rem 6rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(3.5rem, 6vw, 6rem);
+    line-height: 1.05;
+    color: var(--espresso);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--terracotta);
+    display: block;
+  }
+
+  .hero-sub {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    max-width: 340px;
+    margin-bottom: 4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.7s forwards;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.9s forwards;
+  }
+
+  .btn-primary {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-white);
+    background: var(--espresso);
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--terracotta);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+
+  .btn-ghost {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: color 0.3s;
+  }
+  .btn-ghost::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: currentColor;
+    transition: width 0.3s;
+  }
+  .btn-ghost:hover { color: var(--terracotta); }
+  .btn-ghost:hover::before { width: 50px; }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-img-wrap {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: fadeIn 1.5s ease 0.4s forwards;
+  }
+
+  .hero-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+
+  .hero-img-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(253,250,246,0.92) 0%, rgba(253,250,246,0.1) 35%, transparent 55%);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--text-muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--terracotta);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  .scroll-text {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── SECTION COMMON ── */
+  section { position: relative; }
+
+  .section-label {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    line-height: 1.1;
+    color: var(--espresso);
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+
+  /* ── PHILOSOPHY ── */
+  .philosophy {
+    padding: 10rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 8rem;
+    align-items: center;
+    background: var(--cream);
+  }
+
+  .philosophy-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    line-height: 1.4;
+    color: var(--espresso);
+    position: relative;
+    padding-left: 2rem;
+    border-left: 1px solid var(--terracotta);
+  }
+
+  .philosophy-text {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 2;
+    color: var(--text-muted);
+    max-width: 500px;
+  }
+
+  .philosophy-divider {
+    width: 60px; height: 1px;
+    background: var(--terracotta);
+    margin: 2rem 0;
+    opacity: 0.4;
+  }
+
+  /* ── SIGNATURE DISHES ── */
+  .signature {
+    padding: 6rem 0 10rem;
+    background: var(--cream);
+    overflow: hidden;
+  }
+
+  .signature-header {
+    padding: 0 4rem;
+    margin-bottom: 5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .carousel-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .carousel-btn {
+    width: 48px; height: 48px;
+    border: 1px solid var(--cream-deep);
+    background: var(--cream);
+    color: var(--espresso);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .carousel-btn:hover {
+    background: var(--espresso);
+    color: var(--cream);
+    border-color: var(--espresso);
+  }
+
+  .carousel-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .carousel-dot {
+    width: 5px; height: 5px;
+    background: var(--cream-deep);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .carousel-dot.active {
+    background: var(--terracotta);
+    width: 20px;
+    border-radius: 3px;
+  }
+
+  .signature-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    font-weight: 300;
+    color: var(--cream-deep);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Parallax dish cards */
+  .dishes-track {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem 4rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .dishes-track:active { cursor: grabbing; }
+  .dishes-track::-webkit-scrollbar { display: none; }
+
+  .dish-card {
+    flex: 0 0 380px;
+    scroll-snap-align: start;
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    background: var(--espresso);
+  }
+
+  .dish-card-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: transform 0.8s ease, opacity 0.4s ease;
+    transform: scale(1.08);
+  }
+
+  .dish-card:hover .dish-card-img {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  .dish-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(44,26,14,0.95) 0%, rgba(44,26,14,0.2) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.5rem;
+    transform: translateY(60px);
+    transition: transform 0.5s ease;
+  }
+
+  .dish-card:hover .dish-card-overlay {
+    transform: translateY(0);
+  }
+
+  .dish-category {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 0.75rem;
+  }
+
+  .dish-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.8rem;
+    color: var(--cream);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .dish-name em { font-style: italic; }
+
+  .dish-desc {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(247,243,238,0.6);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
+  }
+
+  .dish-card:hover .dish-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .dish-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--terra-pale);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dish-link {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dish-link::after {
+    content: '→';
+    transition: transform 0.3s;
+  }
+  .dish-link:hover::after { transform: translateX(4px); }
+  .dish-card:hover .dish-link { opacity: 1; }
+
+  /* Card number */
+  .dish-number {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    color: rgba(247,243,238,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── MENU PREVIEW ── */
+  .menu-preview {
+    padding: 10rem 4rem;
+    background: var(--cream);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: start;
+  }
+
+  .menu-left { position: sticky; top: 8rem; }
+
+  .menu-image-stack {
+    position: relative;
+    height: 600px;
+    margin-top: 3rem;
+  }
+
+  .menu-img-back {
+    position: absolute;
+    top: 3rem; right: -2rem;
+    width: 75%;
+    height: 420px;
+    object-fit: cover;
+    filter: brightness(0.7);
+  }
+
+  .menu-img-front {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 65%;
+    height: 350px;
+    object-fit: cover;
+    border: 6px solid var(--warm-white);
+    box-shadow: 20px 20px 60px rgba(44,26,14,0.15);
+  }
+
+  .menu-tag {
+    position: absolute;
+    bottom: 2rem; right: 0;
+    background: var(--espresso);
+    color: var(--cream);
+    padding: 1.25rem 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .menu-right {}
+
+  .menu-categories { margin-top: 3rem; }
+
+  .menu-category {
+    border-bottom: 1px solid var(--cream-deep);
+    padding: 2rem 0;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .menu-category:first-child { border-top: 1px solid var(--cream-deep); }
+
+  .menu-category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .menu-category-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--espresso);
+    transition: color 0.3s;
+  }
+
+  .menu-category:hover .menu-category-name { color: var(--terracotta); }
+
+  .menu-category-count {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+  }
+
+  .menu-category-items {
+    margin-top: 1.25rem;
+    display: none;
+  }
+
+  .menu-category.open .menu-category-items { display: block; }
+
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed rgba(156,128,112,0.2);
+  }
+
+  .menu-item:last-child { border-bottom: none; }
+
+  .menu-item-name {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.92rem;
+    color: var(--text-mid);
+  }
+
+  .menu-item-desc {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.2rem;
+  }
+
+  .menu-item-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--terracotta);
+    white-space: nowrap;
+    margin-left: 2rem;
+  }
+
+  /* ── ABOUT STRIP ── */
+  .about-strip {
+    background: var(--espresso);
+    padding: 8rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: center;
+  }
+
+  .about-text .section-label { color: var(--terra-pale); }
+
+  .about-text .section-title { color: var(--cream); }
+
+  .about-body {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.95rem;
+    line-height: 2;
+    color: rgba(247,243,238,0.65);
+    margin-top: 2rem;
+    max-width: 420px;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 4rem;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 3rem;
+    color: var(--terracotta);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.35);
+    margin-top: 0.4rem;
+  }
+
+  .about-image {
+    position: relative;
+    height: 500px;
+  }
+
+  .about-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7) sepia(0.2);
+  }
+
+  .about-image-frame {
+    position: absolute;
+    top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem;
+    border: 1px solid rgba(196,113,74,0.3);
+    pointer-events: none;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 5rem 4rem;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--espresso);
+  }
+
+  .footer-logo span { font-style: italic; color: var(--terracotta); }
+
+  .footer-tagline {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  .footer-info {
+    text-align: center;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 2;
+  }
+
+  .footer-hours {
+    text-align: right;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-mid);
+    line-height: 2;
+  }
+
+  .footer-bottom {
+    width: 100%;
+    padding-top: 2rem;
+    border-top: 1px solid var(--cream-deep);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes scrollLine {
+    0%   { left: -100%; }
+    50%  { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { gap: 1.5rem; }
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-left { padding: 8rem 2rem 4rem; }
+    .hero-right { height: 50vh; }
+    .philosophy { grid-template-columns: 1fr; gap: 3rem; padding: 6rem 2rem; }
+    .signature-header { padding: 0 2rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .dishes-track { padding: 2rem 2rem; }
+    .dish-card { flex: 0 0 300px; height: 420px; }
+    .menu-preview { grid-template-columns: 1fr; gap: 4rem; padding: 6rem 2rem; }
+    .menu-left { position: static; }
+    .about-strip { grid-template-columns: 1fr; gap: 4rem; padding: 6rem 2rem; }
+    footer { padding: 3rem 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Kis<span>sa</span></a>
+  <ul class="nav-links">
+    <li><a href="#signature">Menu</a></li>
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#visit">Visit</a></li>
+    <li><a href="#reservations">Reserve</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Est. 2019 — Slow food, honest flavour</p>
+    <h1 class="hero-title">
+      A table<br>
+      <em>set with</em><br>
+      intention
+    </h1>
+    <p class="hero-sub">Every dish at Kissa begins with a single question — what does this ingredient want to be today? The answer changes with the season. The care never does.</p>
+    <div class="hero-cta">
+      <a href="#signature" class="btn-primary"><span>View the menu</span></a>
+      <a href="#reservations" class="btn-ghost">Reserve a table</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80" alt="Beautifully plated dish">
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll to explore</span>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="reveal">
+    <blockquote class="philosophy-quote">"To cook is to listen to what the land offers today."</blockquote>
+  </div>
+  <div class="reveal">
+    <p class="section-label">Our philosophy</p>
+    <p class="philosophy-text">We source every ingredient within 80 kilometres of our kitchen. The menu changes with what arrives each morning — sometimes a single perfect tomato rewrites the entire day's offering.</p>
+    <div class="philosophy-divider"></div>
+    <p class="philosophy-text">This is not a restaurant that serves what is easy. It is a place that serves what is right.</p>
+  </div>
+</section>
+
+<!-- SIGNATURE DISHES -->
+<section class="signature" id="signature">
+  <div class="signature-header">
+    <div class="reveal">
+      <p class="section-label">Signature dishes</p>
+      <h2 class="section-title">What the<br><em>season brings</em></h2>
+    </div>
+    <div style="display:flex; align-items:center; gap:2rem;">
+      <div class="signature-count reveal">06</div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="prevBtn">←</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+        <button class="carousel-btn" id="nextBtn">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dishes-track" id="dishesTrack">
+
+    <div class="dish-card">
+      <span class="dish-number">01</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Miso Glazed Black Cod">
+      <div class="dish-card-overlay">
+        <span class="dish-category">From the sea</span>
+        <h3 class="dish-name">Miso Glazed<br><em>Black Cod</em></h3>
+        <p class="dish-desc">48-hour miso marinade, dashi broth, pickled daikon, chrysanthemum leaves. A dish that asks for silence.</p>
+        <div class="dish-price">
+          <span>$38</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card">
+      <span class="dish-number">02</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&q=80" alt="Heritage Grain Risotto">
+      <div class="dish-card-overlay">
+        <span class="dish-category">From the earth</span>
+        <h3 class="dish-name">Heritage Grain<br><em>Risotto</em></h3>
+        <p class="dish-desc">Farro and spelt slow-cooked in vegetable dashi, truffle oil, aged pecorino, micro herbs from our garden.</p>
+        <div class="dish-price">
+          <span>$29</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card">
+      <span class="dish-number">03</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80" alt="Aged Duck Breast">
+      <div class="dish-card-overlay">
+        <span class="dish-category">From the farm</span>
+        <h3 class="dish-name">Aged Duck<br><em>Breast</em></h3>
+        <p class="dish-desc">72-hour dry-aged, cherry blossom smoke, persimmon purée, toasted buckwheat, reduction of plum wine.</p>
+        <div class="dish-price">
+          <span>$44</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card">
+      <span class="dish-number">04</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80" alt="Garden Salad">
+      <div class="dish-card-overlay">
+        <span class="dish-category">From the garden</span>
+        <h3 class="dish-name">Morning Garden<br><em>Harvest</em></h3>
+        <p class="dish-desc">Whatever the garden offered before sunrise. Dressed simply with cold-pressed olive oil and sea salt.</p>
+        <div class="dish-price">
+          <span>$18</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card">
+      <span class="dish-number">05</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80" alt="Soba Noodles">
+      <div class="dish-card-overlay">
+        <span class="dish-category">Handmade</span>
+        <h3 class="dish-name">Hand-cut<br><em>Soba</em></h3>
+        <p class="dish-desc">Stone-milled buckwheat, cold kombu dashi, soft poached quail egg, toasted sesame, nori strips.</p>
+        <div class="dish-price">
+          <span>$24</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dish-card">
+      <span class="dish-number">06</span>
+      <img class="dish-card-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=600&q=80" alt="Seasonal Dessert">
+      <div class="dish-card-overlay">
+        <span class="dish-category">Something sweet</span>
+        <h3 class="dish-name">Hojicha<br><em>Panna Cotta</em></h3>
+        <p class="dish-desc">Roasted green tea, fresh yuzu curd, sesame brittle, seasonal fruit. A quiet end to a considered meal.</p>
+        <div class="dish-price">
+          <span>$16</span>
+          <a href="#" class="dish-link">View dish</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MENU PREVIEW -->
+<section class="menu-preview">
+  <div class="menu-left">
+    <div class="reveal">
+      <p class="section-label">Full menu</p>
+      <h2 class="section-title">Crafted for<br><em>every hour</em></h2>
+    </div>
+    <div class="menu-image-stack reveal">
+      <img class="menu-img-back" id="menuImgBack" src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=80" alt="Cafe interior">
+      <img class="menu-img-front" id="menuImgFront" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80" alt="Coffee">
+      <div class="menu-tag" id="menuTag">
+        Morning<br><em>7:00 — 11:30</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-right">
+    <div class="reveal" style="padding-top: 6rem;">
+      <p class="philosophy-text">Our menu is a living document. What you see today may not exist tomorrow — and that is precisely the point.</p>
+    </div>
+
+    <div class="menu-categories reveal">
+
+      <div class="menu-category open" 
+        data-back="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=80"
+        data-front="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80"
+        data-label="Morning" data-hours="7:00 — 11:30">
+        <div class="menu-category-header">
+          <span class="menu-category-name">Morning</span>
+          <span class="menu-category-count">7:00 — 11:30</span>
+        </div>
+        <div class="menu-category-items">
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Shokupan Toast</div>
+              <div class="menu-item-desc">milk bread, cultured butter, house-made jam</div>
+            </div>
+            <span class="menu-item-price">$9</span>
+          </div>
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Tamagoyaki Plate</div>
+              <div class="menu-item-desc">rolled omelette, miso soup, pickles, rice</div>
+            </div>
+            <span class="menu-item-price">$16</span>
+          </div>
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Single Origin Pour Over</div>
+              <div class="menu-item-desc">rotating origins, filter or aeropress</div>
+            </div>
+            <span class="menu-item-price">$6</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-category"
+        data-back="https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80"
+        data-front="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80"
+        data-label="Midday" data-hours="12:00 — 15:00">
+        <div class="menu-category-header">
+          <span class="menu-category-name">Midday</span>
+          <span class="menu-category-count">12:00 — 15:00</span>
+        </div>
+        <div class="menu-category-items">
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Dashi Ramen</div>
+              <div class="menu-item-desc">house broth, chashu, soft egg, nori</div>
+            </div>
+            <span class="menu-item-price">$22</span>
+          </div>
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Karaage Don</div>
+              <div class="menu-item-desc">fried chicken, rice, kewpie, spring onion</div>
+            </div>
+            <span class="menu-item-price">$19</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-category"
+        data-back="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80"
+        data-front="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80"
+        data-label="Evening" data-hours="18:00 — 22:00">
+        <div class="menu-category-header">
+          <span class="menu-category-name">Evening</span>
+          <span class="menu-category-count">18:00 — 22:00</span>
+        </div>
+        <div class="menu-category-items">
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Chef's Omakase</div>
+              <div class="menu-item-desc">5-course seasonal tasting, market ingredients</div>
+            </div>
+            <span class="menu-item-price">$85</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-category"
+        data-back="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80"
+        data-front="https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=600&q=80"
+        data-label="Beverages" data-hours="All day">
+        <div class="menu-category-header">
+          <span class="menu-category-name">Beverages</span>
+          <span class="menu-category-count">All day</span>
+        </div>
+        <div class="menu-category-items">
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Matcha Latte</div>
+              <div class="menu-item-desc">ceremonial grade, oat or whole milk</div>
+            </div>
+            <span class="menu-item-price">$7</span>
+          </div>
+          <div class="menu-item">
+            <div>
+              <div class="menu-item-name">Hojicha Iced</div>
+              <div class="menu-item-desc">roasted green tea, cold brew method</div>
+            </div>
+            <span class="menu-item-price">$6</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="about-text reveal">
+    <p class="section-label">Our story</p>
+    <h2 class="section-title" style="color: var(--cream);">Born from a<br><em>love of quiet</em></h2>
+    <p class="about-body">Kissa began as a single table in a converted warehouse. The word itself — 喫茶 — means a place to drink tea, to sit, to exist without urgency. That spirit has guided every decision since the first morning we opened our doors.</p>
+    <p class="about-body" style="margin-top: 1rem;">We are not interested in volume. We are interested in the moment between the first bite and the second.</p>
+    <div class="about-stats">
+      <div>
+        <div class="stat-num">80<span style="font-size:1.5rem">km</span></div>
+        <div class="stat-label">Sourcing radius</div>
+      </div>
+      <div>
+        <div class="stat-num">12</div>
+        <div class="stat-label">Seats only</div>
+      </div>
+      <div>
+        <div class="stat-num">6</div>
+        <div class="stat-label">Years open</div>
+      </div>
+      <div>
+        <div class="stat-num">1</div>
+        <div class="stat-label">Chef, always</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-image reveal">
+    <div class="about-image-frame"></div>
+    <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=80" alt="Our kitchen">
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="visit">
+  <div>
+    <div class="footer-logo">Kis<span>sa</span></div>
+    <div class="footer-tagline">A quiet place to eat</div>
+  </div>
+  <div class="footer-info">
+    14 Warehouse Lane, East Quarter<br>
+    +1 (555) 012 3456<br>
+    hello@kissacafe.com
+  </div>
+  <div class="footer-hours">
+    Mon – Fri &nbsp; 7:00 — 22:00<br>
+    Saturday &nbsp; 8:00 — 23:00<br>
+    Sunday &nbsp; Closed
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 Kissa. All rights reserved.</span>
+    <span>Privacy · Terms</span>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+      ring.style.opacity = '0';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── CAROUSEL with arrows and dots ──
+  const track = document.getElementById('dishesTrack');
+  const cards = track.querySelectorAll('.dish-card');
+  const dotsContainer = document.getElementById('carouselDots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentIndex = 0;
+  const cardWidth = 380 + 32; // card width + gap
+
+  // Build dots
+  cards.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.classList.add('carousel-dot');
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateDots() {
+    document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goTo(index) {
+    currentIndex = Math.max(0, Math.min(index, cards.length - 1));
+    track.scrollTo({ left: currentIndex * cardWidth, behavior: 'smooth' });
+    updateDots();
+  }
+
+  prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+  nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+  // Auto advance every 4s
+  let autoPlay = setInterval(() => {
+    currentIndex = (currentIndex + 1) % cards.length;
+    goTo(currentIndex);
+  }, 4000);
+
+  // Pause autoplay on hover
+  track.addEventListener('mouseenter', () => clearInterval(autoPlay));
+  track.addEventListener('mouseleave', () => {
+    autoPlay = setInterval(() => {
+      currentIndex = (currentIndex + 1) % cards.length;
+      goTo(currentIndex);
+    }, 4000);
+  });
+
+  // Draggable scroll
+  let isDown = false, startX, scrollLeft;
+  track.addEventListener('mousedown', e => {
+    isDown = true;
+    startX = e.pageX - track.offsetLeft;
+    scrollLeft = track.scrollLeft;
+  });
+  track.addEventListener('mouseleave', () => isDown = false);
+  track.addEventListener('mouseup', () => isDown = false);
+  track.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - track.offsetLeft;
+    track.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  });
+
+  // Sync dots on manual scroll
+  track.addEventListener('scroll', () => {
+    currentIndex = Math.round(track.scrollLeft / cardWidth);
+    updateDots();
+  });
+
+  // ── MENU CATEGORY with image swap ──
+  const menuImgBack = document.getElementById('menuImgBack');
+  const menuImgFront = document.getElementById('menuImgFront');
+  const menuTag = document.getElementById('menuTag');
+
+  function swapMenuImages(cat) {
+    const back = cat.dataset.back;
+    const front = cat.dataset.front;
+    const label = cat.dataset.label;
+    const hours = cat.dataset.hours;
+
+    // Fade out
+    menuImgBack.style.transition = 'opacity 0.4s ease';
+    menuImgFront.style.transition = 'opacity 0.4s ease';
+    menuImgBack.style.opacity = '0';
+    menuImgFront.style.opacity = '0';
+
+    setTimeout(() => {
+      menuImgBack.src = back;
+      menuImgFront.src = front;
+      menuTag.innerHTML = `${label}<br><em>${hours}</em>`;
+      menuImgBack.style.opacity = '0.7';
+      menuImgFront.style.opacity = '1';
+    }, 400);
+  }
+
+  document.querySelectorAll('.menu-category').forEach(cat => {
+    cat.addEventListener('click', () => {
+      const isOpen = cat.classList.contains('open');
+      document.querySelectorAll('.menu-category').forEach(c => c.classList.remove('open'));
+      if (!isOpen) {
+        cat.classList.add('open');
+        swapMenuImages(cat);
+      }
+    });
+  });
+
+  // Hero image subtle zoom on load
+  const heroImg = document.querySelector('.hero-img-wrap img');
+  if (heroImg) {
+    setTimeout(() => heroImg.style.transform = 'scale(1)', 100);
+  }
+</script>
+
+</body>
+</html>
